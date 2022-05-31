@@ -3,6 +3,9 @@ gh xplr
 
 Explore GitHub repos using xplr via GitHub CLI.
 
+### Requirements
+
+- [xplr](https://xplr.dev)
 
 ### Install
 
