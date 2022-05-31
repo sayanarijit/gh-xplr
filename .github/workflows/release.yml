@@ -29,11 +29,11 @@ jobs:
         with:
           toolchain: stable
           target: aarch64-apple-darwin
-      - name: Build for Apple Silicon macOS
-        run: bash ./script/build.sh
-        env:
-          TARGET_TRIPLE: aarch64-apple-darwin
-          GOOS_GOARCH: darwin-arm64
+      # - name: Build for Apple Silicon macOS
+      #   run: bash ./script/build.sh
+      #   env:
+      #     TARGET_TRIPLE: aarch64-apple-darwin
+      #     GOOS_GOARCH: darwin-arm64
       - name: Upload release artifact
         uses: softprops/action-gh-release@v1
         with:
