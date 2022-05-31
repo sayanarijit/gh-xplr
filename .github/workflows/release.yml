@@ -1,16 +1,44 @@
 name: release
+
 on:
   push:
     tags:
       - "v*"
+
 permissions:
   contents: write
 
 jobs:
-  release:
+  release-linux:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: cli/gh-extension-precompile@v1
         with:
-          build_script_override: "script/build.sh"
+          build_script_override: "./scripts/build.sh"
+  release-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build for Intel macOS
+        run: bash ./scripts/build.sh
+        env:
+          TARGET_TRIPLE: x86_64-apple-darwin
+          GOOS_GOARCH: darwin-amd64
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: aarch64-apple-darwin
+      - name: Build for Apple Silicon macOS
+        run: bash ./scripts/build.sh
+        env:
+          TARGET_TRIPLE: aarch64-apple-darwin
+          GOOS_GOARCH: darwin-arm64
+      - name: Upload release artifact
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: false
+          prerelease: false
+          files: |
+            dist/darwin-amd64
+            dist/darwin-arm64
