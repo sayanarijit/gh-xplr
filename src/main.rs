@@ -1,6 +1,7 @@
 use std::env;
 use std::fs;
 use std::io;
+use std::path::Path;
 use std::process::ExitStatus;
 use std::process::{exit, Command};
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -17,6 +18,25 @@ fn returncode(status: io::Result<ExitStatus>) -> i32 {
         }
         Err(e) => {
             eprintln!("error: {}", e.to_string());
+            1
+        }
+    }
+}
+
+fn explore(repo: &Path) -> i32 {
+    let mut cli = xplr::cli::Cli::default();
+    cli.paths.push(repo.into());
+
+    match xplr::runner::from_cli(cli).and_then(|app| app.run()) {
+        Ok(Some(out)) => {
+            print!("{}", out);
+            0
+        }
+        Ok(None) => 0,
+        Err(err) => {
+            if !err.to_string().is_empty() {
+                eprintln!("error: {}", err);
+            };
             1
         }
     }
@@ -46,8 +66,7 @@ fn main() {
     let mut rc = returncode(status);
 
     if rc == 0 {
-        let status = Command::new("xplr").arg(&tmpdir).status();
-        rc = returncode(status);
+        rc = explore(&tmpdir);
     }
 
     if let Err(e) = fs::remove_dir_all(tmpdir) {
