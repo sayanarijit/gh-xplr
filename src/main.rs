@@ -1,4 +1,3 @@
-use std::path::PathBuf;
 use std::process::{exit, id as pid, Command, ExitStatus};
 use std::{env, fs, io};
 
@@ -41,26 +40,6 @@ fn returncode(status: io::Result<ExitStatus>) -> i32 {
     }
 }
 
-fn explore(repo: PathBuf, extra_config_path: PathBuf) -> i32 {
-    let mut cli = xplr::cli::Cli::default();
-    cli.paths.push(repo.into());
-    cli.extra_config.push(extra_config_path.into());
-
-    match xplr::runner::from_cli(cli).and_then(|app| app.run()) {
-        Ok(Some(out)) => {
-            print!("{}", out);
-            0
-        }
-        Ok(None) => 0,
-        Err(err) => {
-            if !err.to_string().is_empty() {
-                eprintln!("error: {}", err);
-            };
-            1
-        }
-    }
-}
-
 fn main() {
     let tmpdir = env::temp_dir().join("gh-xplr").join(pid().to_string());
 
@@ -83,7 +62,13 @@ fn main() {
             rc = 2;
             eprintln!("error: {}", e.to_string());
         } else {
-            rc = explore(tmpdir.clone(), extra_config_path);
+            let status = Command::new("xplr")
+                .arg(&tmpdir)
+                .arg("--extra-config")
+                .arg(extra_config_path)
+                .status();
+
+            rc = returncode(status)
         }
     }
 
