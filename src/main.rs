@@ -85,11 +85,11 @@ fn main() {
 
             rc = returncode(status)
         }
-    }
 
-    if let Err(e) = fs::remove_dir_all(tmpdir) {
-        rc = 2;
-        eprintln!("error: {}", e.to_string());
+        if let Err(e) = fs::remove_dir_all(tmpdir) {
+            rc = 2;
+            eprintln!("error: {}", e.to_string());
+        }
     }
 
     exit(rc);
