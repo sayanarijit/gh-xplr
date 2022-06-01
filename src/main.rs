@@ -1,4 +1,5 @@
-use std::process::{exit, id as pid, Command, ExitStatus};
+use std::process::{exit, Command, ExitStatus};
+use std::time::{SystemTime, UNIX_EPOCH};
 use std::{env, fs, io};
 
 const EXTRA_CONFIG: &str = r###"
@@ -49,7 +50,13 @@ fn returncode(status: io::Result<ExitStatus>) -> i32 {
 }
 
 fn main() {
-    let tmpdir = env::temp_dir().join("gh-xplr").join(pid().to_string());
+    let not_rand = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_millis();
+
+    let tmpname = format!("gh-xplr.{}", not_rand);
+    let tmpdir = env::temp_dir().join(tmpname);
 
     let args = env::args().skip(1);
     let status = Command::new("gh")
