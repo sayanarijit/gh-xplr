@@ -24,4 +24,4 @@ gh xplr sayanarijit/xplr
 
 ### Key Bindings
 
-- <kbd> enter </kbd> - Open the hovered file in the web browser.
+- <kbd> enter </kbd> - Open the hovered or selected files in your web browser.

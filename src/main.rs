@@ -7,18 +7,26 @@ xplr.config.modes.builtin.default.key_bindings.on_key.enter = {
   messages = {
     {
       BashExecSilently = [===[
-        basename=$(basename "$XPLR_FOCUS_PATH")
-        if [ -e "$basename" ]; then
-            gh browse "$basename"
-            url=$(gh browse -n "$basename")
-            echo "LogSuccess: $url" >> "${XPLR_PIPE_MSG_IN}"
-        else
-            gh browse .
-            url=$(gh browse -n .)
-            echo "LogSuccess: $url" >> "${XPLR_PIPE_MSG_IN}"
-        fi
+        while read -r path; do
+
+          dirname=$(dirname "$path")
+          basename=$(basename "$path")
+
+          cd "${dirname:?}"
+
+          if [ -e "$basename" ]; then
+              gh browse "$basename"
+              url=$(gh browse -n "$basename")
+              echo "LogSuccess: $url" >> "${XPLR_PIPE_MSG_IN}"
+          else
+              gh browse .
+              url=$(gh browse -n .)
+              echo "LogSuccess: $url" >> "${XPLR_PIPE_MSG_IN}"
+          fi
+        done < "$XPLR_PIPE_RESULT_OUT"
       ]===]
     },
+    "ClearSelection",
   },
 }
 "###;
