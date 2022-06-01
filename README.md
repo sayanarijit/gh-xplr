@@ -16,3 +16,7 @@ gh extension install sayanarijit/gh-xplr
 ```bash
 gh xplr sayanarijit/xplr
 ```
+
+### Key Bindings
+
+- <kbd> enter </kbd> - Open the hovered file the web browser.

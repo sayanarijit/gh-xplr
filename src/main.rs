@@ -1,10 +1,28 @@
-use std::env;
-use std::fs;
-use std::io;
-use std::path::Path;
-use std::process::ExitStatus;
-use std::process::{exit, Command};
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::path::PathBuf;
+use std::process::{exit, id as pid, Command, ExitStatus};
+use std::{env, fs, io};
+
+const EXTRA_CONFIG: &str = r###"
+xplr.config.modes.builtin.default.key_bindings.on_key.enter = {
+  help = "browse",
+  messages = {
+    {
+      BashExecSilently = [===[
+        basename=$(basename "$XPLR_FOCUS_PATH")
+        if [ -e "$basename" ]; then
+            gh browse "$basename"
+            url=$(gh browse -n "$basename")
+            echo "LogSuccess: $url" >> "${XPLR_PIPE_MSG_IN}"
+        else
+            gh browse .
+            url=$(gh browse -n .)
+            echo "LogSuccess: $url" >> "${XPLR_PIPE_MSG_IN}"
+        fi
+      ]===]
+    },
+  },
+}
+"###;
 
 fn returncode(status: io::Result<ExitStatus>) -> i32 {
     match status {
@@ -23,9 +41,10 @@ fn returncode(status: io::Result<ExitStatus>) -> i32 {
     }
 }
 
-fn explore(repo: &Path) -> i32 {
+fn explore(repo: PathBuf, extra_config_path: PathBuf) -> i32 {
     let mut cli = xplr::cli::Cli::default();
     cli.paths.push(repo.into());
+    cli.extra_config.push(extra_config_path.into());
 
     match xplr::runner::from_cli(cli).and_then(|app| app.run()) {
         Ok(Some(out)) => {
@@ -43,14 +62,7 @@ fn explore(repo: &Path) -> i32 {
 }
 
 fn main() {
-    let not_rand = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap()
-        .as_millis()
-        .to_string();
-
-    let tmpname = format!("gh_xplr_{}", not_rand);
-    let tmpdir = env::temp_dir().join(tmpname);
+    let tmpdir = env::temp_dir().join("gh-xplr").join(pid().to_string());
 
     let args = env::args().skip(1);
     let status = Command::new("gh")
@@ -66,7 +78,13 @@ fn main() {
     let mut rc = returncode(status);
 
     if rc == 0 {
-        rc = explore(&tmpdir);
+        let extra_config_path = tmpdir.join(".git").join("xplr.lua");
+        if let Err(e) = fs::write(&extra_config_path, EXTRA_CONFIG) {
+            rc = 2;
+            eprintln!("error: {}", e.to_string());
+        } else {
+            rc = explore(tmpdir.clone(), extra_config_path);
+        }
     }
 
     if let Err(e) = fs::remove_dir_all(tmpdir) {
