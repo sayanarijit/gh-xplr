@@ -70,10 +70,29 @@ fn main() {
         .status();
 
     let mut rc = returncode(status);
+    let mut version = "".to_string();
+
+    if rc == 0 {
+        let output = Command::new("xplr").arg("--version").output();
+        if let Ok(out) = output {
+            version = out
+                .stdout
+                .into_iter()
+                .map(char::from)
+                .collect::<String>()
+                .replace("xplr ", "")
+                .trim()
+                .to_string();
+
+            rc = returncode(io::Result::Ok(out.status));
+        };
+    }
 
     if rc == 0 {
         let extra_config_path = tmpdir.join(".git").join("xplr.lua");
-        if let Err(e) = fs::write(&extra_config_path, EXTRA_CONFIG) {
+        let extra_config = format!(r#"version = "{}"{}"#, version, EXTRA_CONFIG);
+
+        if let Err(e) = fs::write(&extra_config_path, extra_config) {
             rc = 2;
             eprintln!("error: {}", e.to_string());
         } else {
