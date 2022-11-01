@@ -7,8 +7,8 @@ xplr.config.modes.builtin.default.key_bindings.on_key.enter = {
   help = "browse",
   messages = {
     {
-      BashExecSilently = [===[
-        while read -r path; do
+      BashExecSilently0 = [===[
+        while read -d '' -r path; do
 
           dirname=$(dirname "$path")
           basename=$(basename "$path")
@@ -18,11 +18,11 @@ xplr.config.modes.builtin.default.key_bindings.on_key.enter = {
           if [ -e "$basename" ]; then
               gh browse "$basename"
               url=$(gh browse -n "$basename")
-              echo "LogSuccess: $url" >> "${XPLR_PIPE_MSG_IN}"
+              "$XPLR" -m "LogSuccess: %q" "$url"
           else
               gh browse .
               url=$(gh browse -n .)
-              echo "LogSuccess: $url" >> "${XPLR_PIPE_MSG_IN}"
+              "$XPLR" -m "LogSuccess: %q" "$url"
           fi
         done < "$XPLR_PIPE_RESULT_OUT"
       ]===]
@@ -97,9 +97,12 @@ fn main() {
             eprintln!("error: {}", e.to_string());
         } else {
             let status = Command::new("xplr")
-                .arg(&tmpdir)
                 .arg("--extra-config")
                 .arg(extra_config_path)
+                .arg("--vroot")
+                .arg(&tmpdir)
+                .arg("--")
+                .arg(&tmpdir)
                 .status();
 
             rc = returncode(status)
