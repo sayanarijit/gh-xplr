@@ -11,14 +11,24 @@ https://user-images.githubusercontent.com/11632726/171264387-e6e9be66-82ba-499e-
 
 ### Install
 
+GitHub CLI users
+
 ```bash
 gh extension install sayanarijit/gh-xplr
+```
+
+Rustaceans
+
+```bash
+cargo install gh-xplr
 ```
 
 ### Run
 
 ```bash
 gh xplr sayanarijit/xplr
+# or
+gh-xplr sayanarijit/xplr
 ```
 
 ### Key Bindings
