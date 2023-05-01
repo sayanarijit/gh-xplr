@@ -1,5 +1,4 @@
-gh xplr
-=======
+# gh xplr
 
 Explore GitHub repos using xplr via GitHub CLI.
 
@@ -25,3 +24,4 @@ gh xplr sayanarijit/xplr
 ### Key Bindings
 
 - <kbd> enter </kbd> - Open the hovered or selected files in your web browser.
+- <kbd> g </kbd> <kbd> r </kbd> - Explore another repository (with interactive search support).
