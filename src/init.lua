@@ -116,12 +116,12 @@ xplr.config.modes.custom.go_to_repository = {
   },
 }
 
-xplr.config.modes.custom.go_to_repository.key_bindings.on_key["j"] =
-    xplr.config.modes.builtin.default.key_bindings.on_key["down"]
-xplr.config.modes.custom.go_to_repository.key_bindings.on_key["k"] =
-    xplr.config.modes.builtin.default.key_bindings.on_key["up"]
+xplr.config.modes.custom.go_to_repository.key_bindings.on_key["ctrl-n"] =
+  xplr.config.modes.builtin.default.key_bindings.on_key["down"]
+xplr.config.modes.custom.go_to_repository.key_bindings.on_key["ctrl-p"] =
+  xplr.config.modes.builtin.default.key_bindings.on_key["up"]
 xplr.config.modes.custom.go_to_repository.key_bindings.on_key["back-tab"] =
-    xplr.config.modes.builtin.default.key_bindings.on_key["up"]
+  xplr.config.modes.builtin.default.key_bindings.on_key["up"]
 
 xplr.fn.custom.go_to_repository = {}
 
