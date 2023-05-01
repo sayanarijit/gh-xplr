@@ -2,35 +2,7 @@ use std::process::{exit, Command, ExitStatus};
 use std::time::{SystemTime, UNIX_EPOCH};
 use std::{env, fs, io};
 
-const EXTRA_CONFIG: &str = r###"
-xplr.config.modes.builtin.default.key_bindings.on_key.enter = {
-  help = "browse",
-  messages = {
-    {
-      BashExecSilently0 = [===[
-        while read -d '' -r path; do
-
-          dirname=$(dirname "$path")
-          basename=$(basename "$path")
-
-          cd "${dirname:?}"
-
-          if [ -e "$basename" ]; then
-              gh browse "$basename"
-              url=$(gh browse -n "$basename")
-              "$XPLR" -m "LogSuccess: %q" "$url"
-          else
-              gh browse .
-              url=$(gh browse -n .)
-              "$XPLR" -m "LogSuccess: %q" "$url"
-          fi
-        done < "$XPLR_PIPE_RESULT_OUT"
-      ]===]
-    },
-    "ClearSelection",
-  },
-}
-"###;
+const EXTRA_CONFIG: &str = include_str!("init.lua");
 
 fn returncode(status: io::Result<ExitStatus>) -> i32 {
     match status {
